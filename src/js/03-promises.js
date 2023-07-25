@@ -12,6 +12,18 @@ elems.form.addEventListener('submit', onSubmit);
 function onSubmit(e) {
     e.preventDefault();
 
+    if (
+        elems.inputDelay.value < 0 ||
+        elems.inputStep.value < 0 ||
+        elems.inputAmount.value <= 0
+    ) {
+        Notify.warning(
+            'Please, enter correctly values: DELAY>=0; STEP>=0; AMOUNT>0'
+        );
+        elems.form.reset();
+        return;
+    }
+
     let timeOutDelay = Number(elems.inputDelay.value);
 
     for (let i = 1; i <= Number(elems.inputAmount.value); i += 1) {

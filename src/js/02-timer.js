@@ -4,8 +4,11 @@ import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 let selectedDate = null;
+let timerId = null;
 const elems = {
+    input: document.querySelector('input#datetime-picker'),
     startBtn: document.querySelector('button[data-start]'),
+    resetBtn: document.querySelector('button[data-reset]'),
     spanDays: document.querySelector('span[data-days]'),
     spanHours: document.querySelector('span[data-hours]'),
     spanMinutes: document.querySelector('span[data-minutes]'),
@@ -19,7 +22,7 @@ const options = {
     onClose(selectedDates) {
         if (selectedDates[0] <= Date.now()) {
             Notify.failure('Please choose a date in the future');
-            // alert('Please choose a date in the future');
+
             elems.startBtn.setAttribute('disabled', '');
             return;
         }
@@ -28,12 +31,17 @@ const options = {
     },
 };
 
-elems.startBtn.addEventListener('click', onClick, { once: true });
+elems.startBtn.addEventListener('click', onClickStartBtn);
+elems.resetBtn.addEventListener('click', onClickResetBtn);
 
 flatpickr('#datetime-picker', options);
 
-function onClick() {
-    const timerId = setInterval(() => {
+function onClickStartBtn() {
+    elems.input.setAttribute('disabled', '');
+    elems.startBtn.setAttribute('disabled', '');
+    elems.resetBtn.removeAttribute('disabled');
+
+    timerId = setInterval(() => {
         const counter = selectedDate - Date.now();
         renderTime(convertMs(counter));
 
@@ -41,6 +49,13 @@ function onClick() {
             clearInterval(timerId);
         }
     }, 1000);
+}
+
+function onClickResetBtn() {
+    elems.resetBtn.setAttribute('disabled', '');
+    clearInterval(timerId);
+    renderTime(convertMs(0));
+    elems.input.removeAttribute('disabled');
 }
 
 function convertMs(ms) {
@@ -68,3 +83,5 @@ function renderTime(value) {
     elems.spanMinutes.textContent = addLeadingZero(minutes);
     elems.spanSeconds.textContent = addLeadingZero(seconds);
 }
+
+// можемо для зручності користувача винести додатково кнопку reset, яка обнулює всі дані таймера і зробить інпут знову доступним для обрання дати
